@@ -9,16 +9,34 @@ export async function getUsers(client: Db): Promise<UserRow[]> {
   return data;
 }
 
-export async function getPendingExpenses(client: Db, today: string): Promise<ExpenseSummaryRow[]> {
-  const { data, error } = await client.from('expense_summaries').select('*').lte('expense_date', today).gt('pending_total', 0).order('expense_date', { ascending: false });
+export async function getPendingExpenses(client: Db, today: string, page: number, pageSize: number): Promise<ExpenseSummaryRow[]> {
+  const { data, error } = await client.from('expense_summaries').select('*').lte('expense_date', today).gt('pending_total', 0).order('expense_date', { ascending: false }).range((page - 1) * pageSize, page * pageSize);
   if (error) throw error;
   return data;
 }
 
-export async function getPaidExpenses(client: Db): Promise<ExpenseSummaryRow[]> {
-  const { data, error } = await client.from('expense_summaries').select('*').eq('status', 'paid').order('expense_date', { ascending: false });
+export async function getPaidExpenses(client: Db, page: number, pageSize: number): Promise<ExpenseSummaryRow[]> {
+  const { data, error } = await client.from('expense_summaries').select('*').eq('status', 'paid').order('expense_date', { ascending: false }).range((page - 1) * pageSize, page * pageSize);
   if (error) throw error;
   return data;
+}
+
+export async function getPendingExpensesCount(client: Db, today: string): Promise<number> {
+  const { count, error } = await client.from('expense_summaries').select('*', { count: 'exact', head: true }).lte('expense_date', today).gt('pending_total', 0);
+  if (error) throw error;
+  return count ?? 0;
+}
+
+export async function getPaidExpensesCount(client: Db): Promise<number> {
+  const { count, error } = await client.from('expense_summaries').select('*', { count: 'exact', head: true }).eq('status', 'paid');
+  if (error) throw error;
+  return count ?? 0;
+}
+
+export async function getAuditLogCount(client: Db): Promise<number> {
+  const { count, error } = await client.from('audit_log').select('*', { count: 'exact', head: true });
+  if (error) throw error;
+  return count ?? 0;
 }
 
 export async function getExpense(client: Db, id: string): Promise<ExpenseSummaryRow> {
@@ -45,8 +63,8 @@ export async function getBalances(client: Db): Promise<UserBalanceRow[]> {
   return data;
 }
 
-export async function getAuditLog(client: Db): Promise<AuditRow[]> {
-  const { data, error } = await client.from('audit_log').select('*').order('created_at', { ascending: false }).limit(250);
+export async function getAuditLog(client: Db, page: number, pageSize: number): Promise<AuditRow[]> {
+  const { data, error } = await client.from('audit_log').select('*').order('created_at', { ascending: false }).range((page - 1) * pageSize, page * pageSize);
   if (error) throw error;
   return data;
 }

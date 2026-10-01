@@ -19,7 +19,7 @@ export function HomePage() {
     if (!client) return;
     if (showSpinner) setLoading(true); else setRefreshing(true);
     try {
-      const [nextBalances, nextPending] = await Promise.all([getBalances(client), getPendingExpenses(client, todayLocal())]);
+      const [nextBalances, nextPending] = await Promise.all([getBalances(client), getPendingExpenses(client, todayLocal(), 1, 6)]);
       setBalances(nextBalances);
       setPending(nextPending);
     } finally {
