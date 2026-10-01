@@ -1,0 +1,7 @@
+project_id = "gastos-compartidos-local"
+
+# La aplicación no usa Supabase Auth; se deja el servicio local disponible
+# para mantener el stack estándar de Supabase. Los tests se ejecutan con
+# roles Postgres/anon directamente.
+[auth]
+enabled = true
